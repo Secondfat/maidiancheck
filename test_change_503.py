@@ -1,5 +1,6 @@
 #coding:utf-8
- 
+#Author:Guo Xiangchen
+
 import sys
 import sip
 from PyQt5.QtWidgets import *
@@ -40,6 +41,7 @@ class Example(QWidget):
         #执行使用的文件
         self.bt1.clicked.connect(lambda:do_excel.do_excel(self.json_file_path.text()))
         self.bt1.clicked.connect(self.show_port)
+        self.bt1.clicked.connect(self.pull_phone_info)
 
 
 
@@ -55,10 +57,24 @@ class Example(QWidget):
         up = QHBoxLayout()
 
         self.middle = QVBoxLayout()
+        self.middle_up = QHBoxLayout()
+        device_info_text = QLabel('选择手机')
+        self.app_info = QLineEdit('', self)
+        app_info_text = QLabel('选择APP版本')
+
+        self.device_info = QComboBox()
+        self.device_info.setMinimumWidth(150)#设置最小长度
+
+        #self.device_info.setModel("QAbstractItemView{min-width:400px;height:200px}")
+        self.middle_up.addWidget(device_info_text)
+        self.middle_up.addWidget(self.device_info)
+        self.middle_up.addWidget(app_info_text)
+        self.middle_up.addWidget(self.app_info)
+
 
         self.title_confirm = QPushButton("开始测试埋点", self)
         #self.title_confirm.clicked.connect(self.store_title)
-        self.middle.addWidget(self.title_confirm)
+
 
         self.scroll_area = QScrollArea(self)
         self.scroll_area.setGeometry(0, 0, 400, 400)
@@ -83,6 +99,8 @@ class Example(QWidget):
         #self.middle_left.addWidget(self.result_lb0)
         #last.addWidget(self.url_change)
         #last.addWidget(self.bt2)
+        self.middle.addLayout(self.middle_up)
+        self.middle.addWidget(self.title_confirm)
 
         self.main_layout.addLayout(up)
         self.main_layout.addLayout(self.middle)
@@ -118,6 +136,15 @@ class Example(QWidget):
             mm = mm + 1
         self.scroll_area.setWidget(self.scroll_contents)
 
+    #取数据库中的数据放在下拉栏里
+    def pull_phone_info(self):
+        # 添加下拉框的数据
+        self.device_info.addItem("iPhone 6s plus")
+        self.device_info.addItem("女性")
+        print ("!!!")
+
+
+    #隐藏已经展示的埋点
     def button_delete_dic(self):
         sender = self.sender()
         remove_value = sender.text()
