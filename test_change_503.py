@@ -1,6 +1,7 @@
 #coding:utf-8
  
 import sys
+import sip
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
@@ -111,16 +112,21 @@ class Example(QWidget):
         #print(global_list.port_name)
         for key, value in global_list.excel_dict.items():
             self.cb[key] = QPushButton(value, self.scroll_contents)
-            self.cb[key].clicked.connect(self.delete_dic)
+            self.cb[key].clicked.connect(self.button_delete_dic)
             #self.cb[key].setText(value)
             self.cb[key].move(10, 10+mm*30)
             mm = mm + 1
-            #self.scroll_contents.addWidget(self.cb[i])
-            #print("##" + self.cb[i].text())
         self.scroll_area.setWidget(self.scroll_contents)
 
-    def delete_dic(self):
-        print("!!!")
+    def button_delete_dic(self):
+        sender = self.sender()
+        remove_value = sender.text()
+        for key_match, value_match in global_list.excel_dict.items():
+            if value_match == remove_value:
+                global_list.excel_dict.pop(key_match)
+                break
+        self.cb[key_match].hide()
+
 
     def store_title(self):
         if len(self.title_name) > 0:
