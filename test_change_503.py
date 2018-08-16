@@ -2,20 +2,31 @@
 #Author:Guo Xiangchen
 
 import sys
+import time
 import sip
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 from random import randint
 import do_excel
-#import show_json
-#import do_file
 import global_list
-#import control_web
+import control_window
+import do_show_maidian
 
+#"""更新数据类"""
+class UpdateData(QThread):
+    print("update!!!")
+    update_date = pyqtSignal(str)  # pyqt5 支持python3的str，没有Qstring
+
+    def run(self):
+        cnt = 100
+        while True:
+            cnt += 1
+            print("@@@")
+            self.update_date.emit(str(cnt))  # 发射信号
+            time.sleep(0.3)
 
 class Example(QWidget):
-
     def __init__(self):
         super().__init__()
         self.setWindowTitle('Gfox_test')
@@ -73,7 +84,9 @@ class Example(QWidget):
 
 
         self.title_confirm = QPushButton("开始测试埋点", self)
-        #self.title_confirm.clicked.connect(self.store_title)
+        #self.title_confirm.clicked.connect(lambda:do_show_maidian.watch_mysql())
+        self.title_confirm.clicked.connect(self.update_thread)
+
 
 
         self.scroll_area = QScrollArea(self)
@@ -85,9 +98,12 @@ class Example(QWidget):
         self.scroll_contents = QWidget()
         self.scroll_contents.setGeometry(100, 1000, 10, 20)
         self.scroll_contents.setMinimumSize(1, 1000)
-        self.title_confirm.clicked.connect(self.store_title)
+        #self.title_confirm.clicked.connect(self.store_title)
 
         self.show_editor = QTextEdit()
+        self.update_data_thread = UpdateData()
+        self.update_data_thread.update_date.connect(self.update_text_data)  # 链接信号
+
 
         self.last = QHBoxLayout()
         self.last.addWidget(self.scroll_area)
@@ -154,6 +170,16 @@ class Example(QWidget):
                 break
         self.cb[key_match].hide()
 
+    def update_text_data(self, data):
+        print("item")
+        self.show_editor.insertPlainText(data)
+        self.show_editor.insertPlainText("\n")
+
+
+    #启动跟踪线程
+    def update_thread(self):
+        print("start")
+        self.update_data_thread.start()
 
     def store_title(self):
         if len(self.title_name) > 0:
@@ -180,11 +206,6 @@ class Example(QWidget):
         if filename != '':
             self.r_text=open(filename,'r').read()
             self.show_editor.setPlainText(self.r_text)
-
-    def neme_check(self):
-        checkbox = self.sender()
-        if state == QT.Checked:
-            print("right")
     
 
     def closeEvent(self, event):
