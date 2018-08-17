@@ -26,22 +26,11 @@ class UpdateData(QThread):
         while True:
             if cnt_db_now < cnt_db:
                 tt = do_show_maidian.make_data()
-                self.update_date.emit(str(tt))
-            # if cnt_db_now > cnt_db:
-            #     print("@@@")
-            #     mm="mmm\n123"
-            #     #do_show_maidian.match_result()
-            #     if cnt_db_now == 51:
-            #         self.update_date.emit(str(mm))  # 发射信号
-            #     elif cnt_db_now == 52:
-            #         self.update_date.emit(str())  # 发射信号
-            #     else:
-            #         self.update_date.emit(str(cnt_db_now))  # 发射信号
-            #     # test_change_503.UpdateData.up
-            #     # match_result()
-            #     # results.put(1)
-            #     # return results
-            # cnt_db_now = cnt_db_now + 1
+                print(tt)
+                self.update_date.emit(str(tt)) # 发射信号
+            else:
+                self.update_date.emit(str(cnt_db_now))  # 发射信号
+            cnt_db_now = cnt_db_now + 1
             time.sleep(1)
 
     def select_datacenter(self, sql):
@@ -206,7 +195,7 @@ class Example(QWidget):
         # cursor.movePosition(QTextCursor.End)
         # self.show_editor.setTextCursor(cursor)
         # self.show_editor.ensureCursorVisible()
-        print("item")
+        #print("item")
         if data != "":
             self.show_editor.insertPlainText(data)
             self.show_editor.insertPlainText("\n")

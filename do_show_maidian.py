@@ -24,13 +24,11 @@ def select_datacenter(sql):
 
 def match_result(data):
     result_temp = ""
-    for key, value in global_list.excel_dict_temp.items():
+    for key, value in global_list.excel_dict.items():
         match_key = key + ";"
         match_temp = re.search(match_key, data)
         if match_temp != None:
-            #sleep(1)
-            print(data)
-            print(value)
+            #print(data)
             result_temp = result_temp + data + "\n" + value + "\n"
     #print(result_temp)
     return result_temp
@@ -43,10 +41,9 @@ def make_data():
     with open("maidian.txt", encoding='utf8') as f:
         line = f.readline()
         while line:
-            #print (line)
+            #print(line)
             result_match = match_result(line)
             line = f.readline()
             if result_match != "":
                 result = result + result_match
-    print(result)
     return result
