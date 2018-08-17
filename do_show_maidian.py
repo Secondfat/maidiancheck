@@ -1,9 +1,11 @@
 #coding=utf8
 #Author:Guo Xiangchen
 
+import test_change_503
 import pymysql
 from time import sleep
 import global_list
+import re
 
 
 def select_datacenter(sql):
@@ -20,29 +22,31 @@ def select_datacenter(sql):
     db.close()
     return data
 
-def watch_mysql(process_name, tasks, results, stop_flag):
-    # cnt_db = select_datacenter()
-    cnt_db = 50
-    cnt_db_now = 45
-    while True:
-        #cnt_db_now = select_datacenter()
-        print(cnt_db_now)
-        if cnt_db_now > cnt_db:
-            print ("!!")
-            cnt_db = cnt_db_now
-            results = -1
-            return results
-        cnt_db_now = cnt_db_now + 1
-        sleep(1)
+def match_result(data):
+    result_temp = ""
+    for key, value in global_list.excel_dict_temp.items():
+        match_key = key + ";"
+        match_temp = re.search(match_key, data)
+        if match_temp != None:
+            #sleep(1)
+            print(data)
+            print(value)
+            result_temp = result_temp + data + "\n" + value + "\n"
+    #print(result_temp)
+    return result_temp
 
 
-def match_result(process_name, tasks, results, stop_flag):
-    while True:
-        print("$$$")
-        if len(global_list.maidian_all) != 0:
-            sleep(1)
-            print("mmm")
-            print(global_list.maidian_all)
-            global_list.maidian_all = []
-            print("!" + global_list.maidian_all)
-        sleep(1)
+
+#if __name__ == '__main__':
+def make_data():
+    result = ""
+    with open("maidian.txt", encoding='utf8') as f:
+        line = f.readline()
+        while line:
+            #print (line)
+            result_match = match_result(line)
+            line = f.readline()
+            if result_match != "":
+                result = result + result_match
+    print(result)
+    return result

@@ -3,15 +3,17 @@
 
 import sys
 import time
-import sip
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
-from random import randint
 import do_excel
 import global_list
-import control_window
+import pymysql
 import do_show_maidian
+
+
+# global show_flag
+# show_flag = 0
 
 #"""更新数据类"""
 class UpdateData(QThread):
@@ -19,12 +21,42 @@ class UpdateData(QThread):
     update_date = pyqtSignal(str)  # pyqt5 支持python3的str，没有Qstring
 
     def run(self):
-        cnt = 100
+        cnt_db = 50
+        cnt_db_now = 49
         while True:
-            cnt += 1
-            print("@@@")
-            self.update_date.emit(str(cnt))  # 发射信号
-            time.sleep(0.3)
+            if cnt_db_now < cnt_db:
+                tt = do_show_maidian.make_data()
+                self.update_date.emit(str(tt))
+            # if cnt_db_now > cnt_db:
+            #     print("@@@")
+            #     mm="mmm\n123"
+            #     #do_show_maidian.match_result()
+            #     if cnt_db_now == 51:
+            #         self.update_date.emit(str(mm))  # 发射信号
+            #     elif cnt_db_now == 52:
+            #         self.update_date.emit(str())  # 发射信号
+            #     else:
+            #         self.update_date.emit(str(cnt_db_now))  # 发射信号
+            #     # test_change_503.UpdateData.up
+            #     # match_result()
+            #     # results.put(1)
+            #     # return results
+            # cnt_db_now = cnt_db_now + 1
+            time.sleep(1)
+
+    def select_datacenter(self, sql):
+        ###mysql connect###
+        db = pymysql.connect("", "root", "", "data_center", charset='utf8')
+        cursor = db.cursor()
+        try:
+            # 执行sql语句
+            cursor.execute(sql)
+            data = cursor.fetchall()
+        except Exception:
+            return False
+        # 关闭数据库连接
+        db.close()
+        return data
 
 class Example(QWidget):
     def __init__(self):
@@ -98,7 +130,6 @@ class Example(QWidget):
         self.scroll_contents = QWidget()
         self.scroll_contents.setGeometry(100, 1000, 10, 20)
         self.scroll_contents.setMinimumSize(1, 1000)
-        #self.title_confirm.clicked.connect(self.store_title)
 
         self.show_editor = QTextEdit()
         self.update_data_thread = UpdateData()
@@ -171,9 +202,16 @@ class Example(QWidget):
         self.cb[key_match].hide()
 
     def update_text_data(self, data):
+        # cursor = self.show_editor.textCursor()
+        # cursor.movePosition(QTextCursor.End)
+        # self.show_editor.setTextCursor(cursor)
+        # self.show_editor.ensureCursorVisible()
         print("item")
-        self.show_editor.insertPlainText(data)
-        self.show_editor.insertPlainText("\n")
+        if data != "":
+            self.show_editor.insertPlainText(data)
+            self.show_editor.insertPlainText("\n")
+        else:
+            pass
 
 
     #启动跟踪线程
