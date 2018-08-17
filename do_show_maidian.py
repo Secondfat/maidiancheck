@@ -28,9 +28,7 @@ def match_result(data):
         match_key = key + ";"
         match_temp = re.search(match_key, data)
         if match_temp != None:
-            #print(data)
-            result_temp = result_temp + data + "\n" + value + "\n"
-    #print(result_temp)
+            result_temp = result_temp + data + value + "\n" + "\n"
     return result_temp
 
 
