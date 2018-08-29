@@ -26,6 +26,6 @@ def do_excel(path):
 		print ("Excel炸了")
 
 
-if __name__ == '__main__':
-	path = "D:/04 code/maidiancheck/App-搜索需求-V6.5埋点-V1.0.xlsx"
-	do_excel(path)
+#if __name__ == '__main__':
+#	path = "D:/04 code/maidiancheck/App-搜索需求-V6.5埋点-V1.0.xlsx"
+#	do_excel(path)

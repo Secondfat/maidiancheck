@@ -25,11 +25,11 @@ class UpdateData(QThread):
         print("run!")
         #print(global_list.appinfo)
         sql = "SELECT COUNT(*) FROM maidian_log;"
-        cnt_db_temp = self.select_datacenter(sql)
+        cnt_db_temp = self.select_guo_db(sql)
         cnt_db = int(cnt_db_temp[0][0])#启动时表中的数据量
         #print(cnt_db)
         while True:
-            cnt_db_now_temp = self.select_datacenter(sql)#每4秒刷新一次表中数量
+            cnt_db_now_temp = self.select_guo_db(sql)#每4秒刷新一次表中数量
             cnt_db_now = int(cnt_db_now_temp[0][0])
             if cnt_db_now > cnt_db:#如果增多，则匹配进入埋点
                 cnt_log = cnt_db_now - cnt_db#取变化的数据个数
@@ -40,9 +40,9 @@ class UpdateData(QThread):
                 pass
                 #self.update_date.emit(str(cnt_db_now))  # 发射信号
             #cnt_db_now = cnt_db_now + 1
-            time.sleep(3)
+            time.sleep(1)
 
-    def select_datacenter(self, sql):
+    def select_guo_db(self, sql):
         ###mysql connect###
         db = pymysql.connect("10.134.96.54", "root", "test", "guo_db", charset='utf8')
         cursor = db.cursor()
@@ -56,18 +56,7 @@ class UpdateData(QThread):
         db.close()
         return data
 
-    def select_mobilephone(self, sql):
-        db = pymysql.connect("10.134.96.54", "root", "test", "guo_db", charset='utf8')
-        cursor = db.cursor()
-        try:
-            # 执行sql语句
-            cursor.execute(sql)
-            data = cursor.fetchall()
-        except Exception:
-            return False
-        # 关闭数据库连接
-        db.close()
-        return data
+
 
 class Example(QWidget):
     def __init__(self):
@@ -198,7 +187,7 @@ class Example(QWidget):
     def pull_phone_info(self):
         # 添加下拉框的数据
         sql = "SELECT model FROM mobliephone;"
-        mobile_info = UpdateData.select_mobilephone(UpdateData, sql);
+        mobile_info = UpdateData.select_guo_db(UpdateData, sql)
         for mobile_temp in mobile_info:
             self.device_info.addItem(mobile_temp[0])
             #self.device_info.addItem("")
@@ -235,8 +224,7 @@ class Example(QWidget):
     def dev_appinfo_tran(self):
         global_list.appinfo = self.app_info.text()
         global_list.device = self.device_info.currentText()
-        print(global_list.appinfo)
-        print(global_list.device)
+
 
     def store_title(self):
         if len(self.title_name) > 0:
