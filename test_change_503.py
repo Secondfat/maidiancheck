@@ -15,27 +15,48 @@ import do_show_maidian
 # global show_flag
 # show_flag = 0
 
+
 #"""更新数据类"""
 class UpdateData(QThread):
     print("update!!!")
     update_date = pyqtSignal(str)  # pyqt5 支持python3的str，没有Qstring
 
     def run(self):
-        cnt_db = 50
-        cnt_db_now = 49
+        print("run!")
+        sql = "SELECT COUNT(*) FROM maidian_log;"
+        cnt_db_temp = self.select_datacenter(sql)
+        cnt_db = int(cnt_db_temp[0][0])#启动时表中的数据量
+        print(cnt_db)
         while True:
-            if cnt_db_now < cnt_db:
-                tt = do_show_maidian.make_data()
-                print(tt)
+            cnt_db_now_temp = self.select_datacenter(sql)#每4秒刷新一次表中数量
+            cnt_db_now = int(cnt_db_now_temp[0][0])
+            if cnt_db_now == cnt_db:#如果增多，则匹配进入埋点
+                cnt_log = cnt_db_now - cnt_db#取变化的数据个数
+                tt = do_show_maidian.make_data(cnt_log)
+                #print(tt)
                 self.update_date.emit(str(tt)) # 发射信号
-            else:
+                cnt_db = cnt_db_now
+            else:#否则，继续sleep
                 self.update_date.emit(str(cnt_db_now))  # 发射信号
             cnt_db_now = cnt_db_now + 1
-            time.sleep(1)
+            time.sleep(5)
 
     def select_datacenter(self, sql):
         ###mysql connect###
-        db = pymysql.connect("", "root", "", "data_center", charset='utf8')
+        db = pymysql.connect("10.134.96.54", "root", "test", "guo_db", charset='utf8')
+        cursor = db.cursor()
+        try:
+            # 执行sql语句
+            cursor.execute(sql)
+            data = cursor.fetchall()
+        except Exception:
+            return False
+        # 关闭数据库连接
+        db.close()
+        return data
+
+    def select_mobilephone(self, sql):
+        db = pymysql.connect("10.134.96.54", "root", "test", "guo_db", charset='utf8')
         cursor = db.cursor()
         try:
             # 执行sql语句
@@ -90,17 +111,17 @@ class Example(QWidget):
 
         self.middle = QVBoxLayout()
         self.middle_up = QHBoxLayout()
-        device_info_text = QLabel('选择手机')
+        self.device_info_text = QLabel('选择手机')
         self.app_info = QLineEdit('', self)
-        app_info_text = QLabel('选择APP版本')
+        self.app_info_text = QLabel('选择APP版本')
 
         self.device_info = QComboBox()
         self.device_info.setMinimumWidth(150)#设置最小长度
 
         #self.device_info.setModel("QAbstractItemView{min-width:400px;height:200px}")
-        self.middle_up.addWidget(device_info_text)
+        self.middle_up.addWidget(self.device_info_text)
         self.middle_up.addWidget(self.device_info)
-        self.middle_up.addWidget(app_info_text)
+        self.middle_up.addWidget(self.app_info_text)
         self.middle_up.addWidget(self.app_info)
 
 
@@ -175,9 +196,11 @@ class Example(QWidget):
     #取数据库中的数据放在下拉栏里
     def pull_phone_info(self):
         # 添加下拉框的数据
-        self.device_info.addItem("iPhone 6s plus")
-        self.device_info.addItem("女性")
-        print ("!!!")
+        sql = "SELECT model FROM mobliephone;"
+        mobile_info = UpdateData.select_mobilephone(UpdateData, sql);
+        for mobile_temp in mobile_info:
+            self.device_info.addItem(mobile_temp[0])
+            #self.device_info.addItem("")
 
 
     #隐藏已经展示的埋点
