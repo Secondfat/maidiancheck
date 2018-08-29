@@ -23,23 +23,24 @@ class UpdateData(QThread):
 
     def run(self):
         print("run!")
+        #print(global_list.appinfo)
         sql = "SELECT COUNT(*) FROM maidian_log;"
         cnt_db_temp = self.select_datacenter(sql)
         cnt_db = int(cnt_db_temp[0][0])#启动时表中的数据量
-        print(cnt_db)
+        #print(cnt_db)
         while True:
             cnt_db_now_temp = self.select_datacenter(sql)#每4秒刷新一次表中数量
             cnt_db_now = int(cnt_db_now_temp[0][0])
-            if cnt_db_now == cnt_db:#如果增多，则匹配进入埋点
+            if cnt_db_now > cnt_db:#如果增多，则匹配进入埋点
                 cnt_log = cnt_db_now - cnt_db#取变化的数据个数
                 tt = do_show_maidian.make_data(cnt_log)
-                #print(tt)
                 self.update_date.emit(str(tt)) # 发射信号
                 cnt_db = cnt_db_now
             else:#否则，继续sleep
-                self.update_date.emit(str(cnt_db_now))  # 发射信号
-            cnt_db_now = cnt_db_now + 1
-            time.sleep(5)
+                pass
+                #self.update_date.emit(str(cnt_db_now))  # 发射信号
+            #cnt_db_now = cnt_db_now + 1
+            time.sleep(3)
 
     def select_datacenter(self, sql):
         ###mysql connect###
@@ -113,7 +114,7 @@ class Example(QWidget):
         self.middle_up = QHBoxLayout()
         self.device_info_text = QLabel('选择手机')
         self.app_info = QLineEdit('', self)
-        self.app_info_text = QLabel('选择APP版本')
+        self.app_info_name = QLabel('APP版本')
 
         self.device_info = QComboBox()
         self.device_info.setMinimumWidth(150)#设置最小长度
@@ -121,14 +122,14 @@ class Example(QWidget):
         #self.device_info.setModel("QAbstractItemView{min-width:400px;height:200px}")
         self.middle_up.addWidget(self.device_info_text)
         self.middle_up.addWidget(self.device_info)
-        self.middle_up.addWidget(self.app_info_text)
+        self.middle_up.addWidget(self.app_info_name)
         self.middle_up.addWidget(self.app_info)
 
 
         self.title_confirm = QPushButton("开始测试埋点", self)
         #self.title_confirm.clicked.connect(lambda:do_show_maidian.watch_mysql())
+        self.title_confirm.clicked.connect(self.dev_appinfo_tran)
         self.title_confirm.clicked.connect(self.update_thread)
-
 
 
         self.scroll_area = QScrollArea(self)
@@ -169,7 +170,7 @@ class Example(QWidget):
         filename, filetype = QFileDialog.getOpenFileName(self,
                                                          "选取文件",
                                                          "D:/",
-                                                         "Text Files (*.json)");
+                                                         "Text Files (*.xlsx)");
         if filename != '':
             self.json_file_path.setText(filename)
         
@@ -230,6 +231,12 @@ class Example(QWidget):
     def update_thread(self):
         print("start")
         self.update_data_thread.start()
+
+    def dev_appinfo_tran(self):
+        global_list.appinfo = self.app_info.text()
+        global_list.device = self.device_info.currentText()
+        print(global_list.appinfo)
+        print(global_list.device)
 
     def store_title(self):
         if len(self.title_name) > 0:

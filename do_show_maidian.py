@@ -35,12 +35,13 @@ def match_result(data):
 
 #if __name__ == '__main__':
 def make_data(cnt_log):
+    print("appinfo=" + global_list.appinfo)
     result = ""
-    #sql = "SELECT * FROM maidian_log order by No DESC limit %d;" %cnt_log
-    sql = "SELECT * FROM maidian_log order by No DESC limit 5;"
+    sql = "SELECT * FROM maidian_log order by No DESC limit %d;" %cnt_log
+    #sql = "SELECT * FROM maidian_log order by No DESC limit 5;"
     data = select_datacenter(sql)
-    for i in range(0, 5):
-        if data[i][1] == "iPhone10" and data[i][3] == "6.6.0":
+    for i in range(0, cnt_log):
+        if data[i][1] == global_list.device and data[i][3] == global_list.appinfo:
             data_log = data[i][4].split("|||")
             #print(data[i][4])
             for line in data_log:
