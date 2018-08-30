@@ -24,10 +24,10 @@ def select_guo_db(sql):
 
 def match_result(data):
     result_temp = ""
-    for key, value in global_list.excel_dict.items():
-        match_key = key + ";"
+    for key, value in global_list.excel_dict[global_list.osname].items():
+        match_key = key + "(;|#)"
         match_temp = re.search(match_key, data)
-        if match_temp != None:
+        if match_temp != None :
             result_temp = result_temp + data + "\n" + value + "\n" + "\n"
     return result_temp
 

@@ -83,8 +83,8 @@ class Example(QWidget):
         self.bt1.setToolTip('<b>点击这里猜数字</b>')
         #执行使用的文件
         self.bt1.clicked.connect(lambda:do_excel.do_excel(self.json_file_path.text()))
-        self.bt1.clicked.connect(self.show_port)
-        self.bt1.clicked.connect(self.pull_phone_info)
+        self.bt1.clicked.connect(self.pull_os_info)
+        #self.bt1.clicked.connect(self.pull_phone_info)
 
 
 
@@ -101,14 +101,19 @@ class Example(QWidget):
 
         self.middle = QVBoxLayout()
         self.middle_up = QHBoxLayout()
+        self.os_info_name = QLabel('选择系统')
+        self.os_info = QComboBox()
+        self.os_info.setMinimumWidth(100)  # 设置最小长度
+        self.os_info.activated[str].connect(self.pull_phone_info)#点击界面之后转向对应函数，activated即为点击的响应，同时传递str为参数
         self.device_info_text = QLabel('选择手机')
+        self.device_info = QComboBox()
+        self.device_info.setMinimumWidth(150)#设置最小长度
         self.app_info = QLineEdit('', self)
         self.app_info_name = QLabel('APP版本')
 
-        self.device_info = QComboBox()
-        self.device_info.setMinimumWidth(150)#设置最小长度
-
         #self.device_info.setModel("QAbstractItemView{min-width:400px;height:200px}")
+        self.middle_up.addWidget(self.os_info_name)
+        self.middle_up.addWidget(self.os_info)
         self.middle_up.addWidget(self.device_info_text)
         self.middle_up.addWidget(self.device_info)
         self.middle_up.addWidget(self.app_info_name)
@@ -117,6 +122,7 @@ class Example(QWidget):
 
         self.title_confirm = QPushButton("开始测试埋点", self)
         #self.title_confirm.clicked.connect(lambda:do_show_maidian.watch_mysql())
+        self.title_confirm.clicked.connect(self.show_port)
         self.title_confirm.clicked.connect(self.dev_appinfo_tran)
         self.title_confirm.clicked.connect(self.update_thread)
 
@@ -159,7 +165,7 @@ class Example(QWidget):
         filename, filetype = QFileDialog.getOpenFileName(self,
                                                          "选取文件",
                                                          "D:/",
-                                                         "Text Files (*.xlsx)");
+                                                         "Text Files (*.xlsx *.xls)");
         if filename != '':
             self.json_file_path.setText(filename)
         
@@ -168,14 +174,14 @@ class Example(QWidget):
         source = self.sender()
 
         self.scroll_contents = QWidget()  
-        self.scroll_contents.setGeometry(100, 1000, 10, 20)  
+        self.scroll_contents.setGeometry(100, 1000, 10, 20)
         self.scroll_contents.setMinimumSize(1, 10000)
         self.last.addWidget(self.scroll_area)
 
         self.cb = {}
         mm = 0
         #print(global_list.port_name)
-        for key, value in global_list.excel_dict.items():
+        for key, value in global_list.excel_dict[global_list.osname].items():
             self.cb[key] = QPushButton(value, self.scroll_contents)
             self.cb[key].clicked.connect(self.button_delete_dic)
             #self.cb[key].setText(value)
@@ -183,12 +189,23 @@ class Example(QWidget):
             mm = mm + 1
         self.scroll_area.setWidget(self.scroll_contents)
 
+    #设置初始系统的值
+    def pull_os_info(self):
+        self.os_info.clear()
+        self.device_info.clear()
+        self.os_info.addItem("请选择")
+        self.os_info.addItem("iOS")
+        self.os_info.addItem("Android")
+        #self.os_info.activated[str].connect(self.pull_phone_info)
+
     #取数据库中的数据放在下拉栏里
-    def pull_phone_info(self):
+    def pull_phone_info(self, os_name):
         # 添加下拉框的数据
-        sql = "SELECT model FROM mobliephone;"
-        mobile_info = UpdateData.select_guo_db(UpdateData, sql)
-        for mobile_temp in mobile_info:
+        self.device_info.clear()
+        sql = "SELECT realphone, model FROM mobliephone WHERE osinfo='%s';" %os_name
+        global_list.osname = os_name
+        self.mobile_info = UpdateData.select_guo_db(UpdateData, sql)
+        for mobile_temp in self.mobile_info:
             self.device_info.addItem(mobile_temp[0])
             #self.device_info.addItem("")
 
@@ -197,9 +214,9 @@ class Example(QWidget):
     def button_delete_dic(self):
         sender = self.sender()
         remove_value = sender.text()
-        for key_match, value_match in global_list.excel_dict.items():
+        for key_match, value_match in global_list.excel_dict[global_list.osname].items():
             if value_match == remove_value:
-                global_list.excel_dict.pop(key_match)
+                global_list.excel_dict[global_list.osname].pop(key_match)
                 break
         self.cb[key_match].hide()
 
@@ -223,7 +240,10 @@ class Example(QWidget):
 
     def dev_appinfo_tran(self):
         global_list.appinfo = self.app_info.text()
-        global_list.device = self.device_info.currentText()
+        for mobile_temp in self.mobile_info:
+            if mobile_temp[0] == self.device_info.currentText():
+                global_list.device = mobile_temp[1]
+                break
 
 
     def store_title(self):
