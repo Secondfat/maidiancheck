@@ -26,6 +26,7 @@ def match_result(data):
     result_temp = ""
     for key, value in global_list.excel_dict[global_list.osname].items():
         match_key = key + "(;|#)"
+        print (match_key)
         match_temp = re.search(match_key, data)
         if match_temp != None :
             result_temp = result_temp + data + "\n" + value + "\n" + "\n"
@@ -36,17 +37,19 @@ def match_result(data):
 def make_data(cnt_log):
 #    print("appinfo=" + global_list.appinfo)
     result = ""
-    sql = "SELECT * FROM maidian_log order by No DESC limit %d;" %cnt_log
+    sql = "SELECT osinfo, model, appinfo, log FROM maidian_log order by No DESC limit %d;" %cnt_log
     #sql = "SELECT * FROM maidian_log order by No DESC limit 5;"
     data = select_guo_db(sql)
     for i in range(0, cnt_log):
-        if data[i][1] == global_list.device and data[i][3] == global_list.appinfo:
-            data_log = data[i][4].split("|||")
-            #print(data[i][4])
-            for line in data_log:
-                #print(line)
-                result_match = match_result(line)
-                if result_match != "":
-                    result = result + result_match
+        if data[i][0] == global_list.osname:
+            if data[i][1] == global_list.device and data[i][2] == global_list.appinfo:
+                print ("##")
+                data_log = data[i][3].split("|||")
+                #print(data[i][4])
+                for line in data_log:
+                    #print(line)
+                    result_match = match_result(line)
+                    if result_match != "":
+                        result = result + result_match
     #print(result)
     return result
