@@ -7,8 +7,7 @@ import global_list
 
 def do_excel(path):
 	ExcelFile = xlrd.open_workbook(path)
-	print (ExcelFile.sheet_names())
-	#try:
+
 	if len(ExcelFile.sheet_names()) > 1:
 		for name_test in ExcelFile.sheet_names():
 			print (name_test)
@@ -19,9 +18,20 @@ def do_excel(path):
 			sheet = ExcelFile.sheet_by_name(os_name)
 			#print(os_name)
 			store_dic(os_name, sheet)
+		if global_list.excel_dict['iOS'] != {} and global_list.excel_dict['Android'] != {}:
+			global_list.excel_value = 1
+		elif global_list.excel_dict['iOS'] != {}:
+			global_list.excel_value = 2
+		elif global_list.excel_dict['Android'] != {}:
+			global_list.excel_value = 3
+		else:
+			return -1
 	else:
 		print("Excel no sheet")
-	print(global_list.excel_dict)
+		global_list.excel_value = -1
+		return -1
+
+	#print(global_list.excel_dict)
 		# name_rows = sheet.row_values(1)
 		# if '友盟埋点' in name_rows:
 		# 	key_index = name_rows.index("友盟埋点")
