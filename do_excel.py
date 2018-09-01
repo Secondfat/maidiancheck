@@ -25,7 +25,7 @@ def do_excel(path):
 			if os_name != "":
 				sheet = ExcelFile.sheet_by_name(os_name)
 				#print(os_name)
-				# store_dic(os_name, sheet)
+				store_dic(os_name, sheet)
 			else:
 				continue
 		if global_list.excel_dict['iOS'] != {} and global_list.excel_dict['Android'] != {}:

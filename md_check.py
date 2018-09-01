@@ -76,7 +76,7 @@ class Example(QWidget):
         #self.change_value = []
 
         #定义控件
-        self.json_file_path = QLineEdit('', self)
+        self.json_file_path = QLineEdit('D:/04 code/maidiancheck/App-搜索需求-V6.5埋点-V1.0.xlsx', self)
         self.json_file_path.selectAll()
         self.json_file_path.setFocus()
         self.bt = QPushButton('选择文件')
@@ -127,9 +127,8 @@ class Example(QWidget):
 
         self.title_confirm = QPushButton("开始测试埋点", self)
         #self.title_confirm.clicked.connect(lambda:do_show_maidian.watch_mysql())
-        self.title_confirm.clicked.connect(self.show_port)
-        self.title_confirm.clicked.connect(self.dev_appinfo_tran)
-        self.title_confirm.clicked.connect(self.update_thread)
+        self.title_confirm.clicked.connect(self.check_null)
+
 
 
         self.scroll_area = QScrollArea(self)
@@ -179,13 +178,29 @@ class Example(QWidget):
         print("发射")
         self.excel_signal.emit(global_list.excel_value) # 发射信号
 
+
     @pyqtSlot()
     def show_excel_message(self):#弹窗槽函数
         print("!!")
-        value_result = {'1':'iOS和Android埋点解析完毕', '2':'iOS和Android埋点解析完毕', '3':'iOS和Android埋点解析完毕', '-1':'无对应埋点需求，请检查上传的文档', '-2':'请检查文档是否正确'}
-        QMessageBox.information(self, "提示", value_result[str(global_list.excel_value)],
-                                QMessageBox.Yes)
+        value_result = {'1':'iOS和Android埋点解析完毕', '2':'iOS和Android埋点解析完毕', '3':'iOS和Android埋点解析完毕', \
+                        '-1':'无对应埋点需求，请检查上传的文档', '-2':'请检查文档是否正确', '-3':'请填写APP版本号', '-4':'请选择系统'}
+        if int(global_list.excel_value) < 10:
+            QMessageBox.information(self, "提示", value_result[str(global_list.excel_value)],
+                                    QMessageBox.Yes)
         logging.log(logging.INFO, "This is a info log.")
+
+    #检查os和appinfo是否为空
+    def check_null(self):
+        if self.os_info.currentText() == "请选择":
+            global_list.excel_value = -4
+            self.show_excel_message()
+        elif self.app_info.text() == "":
+            global_list.excel_value = -3
+            self.show_excel_message()
+        else:
+            self.show_port()
+            self.dev_appinfo_tran()
+            self.update_thread()
 
     #展示每一个接口
     def show_port(self):
@@ -256,6 +271,7 @@ class Example(QWidget):
         print("start")
         self.update_data_thread.start()
 
+    #传递参数
     def dev_appinfo_tran(self):
         global_list.appinfo = self.app_info.text()
         for mobile_temp in self.mobile_info:
