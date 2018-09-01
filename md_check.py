@@ -10,6 +10,7 @@ import do_excel
 import global_list
 import pymysql
 import do_show_maidian
+import logging
 
 
 # global show_flag
@@ -59,6 +60,7 @@ class UpdateData(QThread):
 
 
 class Example(QWidget):
+    excel_signal = pyqtSignal(int)  # 设置信号
     def __init__(self):
         super().__init__()
         self.setWindowTitle('Gfox_test')
@@ -74,7 +76,7 @@ class Example(QWidget):
         #self.change_value = []
 
         #定义控件
-        self.json_file_path = QLineEdit('D:/04 code/maidiancheck/App-搜索需求-V6.5埋点-V1.0.xlsx', self)
+        self.json_file_path = QLineEdit('', self)
         self.json_file_path.selectAll()
         self.json_file_path.setFocus()
         self.bt = QPushButton('选择文件')
@@ -82,9 +84,11 @@ class Example(QWidget):
         self.bt1 = QPushButton('解析文件')
         self.bt1.setToolTip('<b>点击这里猜数字</b>')
         #执行使用的文件
+        self.excel_signal.connect(self.show_excel_message)  # 信号和槽连接
         self.bt1.clicked.connect(lambda:do_excel.do_excel(self.json_file_path.text()))
-        #self.bt1.clicked.connect(self.show_excel_message)
+        self.bt1.clicked.connect(self.excel_value_emit)
         self.bt1.clicked.connect(self.pull_os_info)
+
         #self.bt1.clicked.connect(self.pull_phone_info)
 
 
@@ -171,20 +175,17 @@ class Example(QWidget):
             self.json_file_path.setText(filename)
 
 
-    def show_excel_message(self, excel_value):
-        for case in switch(excel_value):
-            if case== 1:
-                QMessageBox.information(self, "提示", "iOS和Android埋点解析完毕",
-                                        QMessageBox.Yes)
-            elif case == 2:
-                QMessageBox.information(self, "提示", "iOS埋点解析完毕",
-                                        QMessageBox.Yes)
-            elif case == 3:
-                QMessageBox.information(self, "提示", "Android埋点解析完毕",
-                                        QMessageBox.Yes)
-            elif case == -1:
-                QMessageBox.critical(self, "错误", "无对应埋点需求，请检查上传的文档",
-                                        QMessageBox.Yes)
+    def excel_value_emit(self):
+        print("发射")
+        self.excel_signal.emit(global_list.excel_value) # 发射信号
+
+    @pyqtSlot()
+    def show_excel_message(self):#弹窗槽函数
+        print("!!")
+        value_result = {'1':'iOS和Android埋点解析完毕', '2':'iOS和Android埋点解析完毕', '3':'iOS和Android埋点解析完毕', '-1':'无对应埋点需求，请检查上传的文档', '-2':'请检查文档是否正确'}
+        QMessageBox.information(self, "提示", value_result[str(global_list.excel_value)],
+                                QMessageBox.Yes)
+        logging.log(logging.INFO, "This is a info log.")
 
     #展示每一个接口
     def show_port(self):
