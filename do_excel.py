@@ -10,14 +10,18 @@ def do_excel(path):
 
 	if len(ExcelFile.sheet_names()) > 1:
 		for name_test in ExcelFile.sheet_names():
-			print (name_test)
-			if "iOS" == name_test or "ios" == name_test:
-				os_name = "iOS"
-			if "Android" ==name_test or "android" == name_test:
-				os_name = "Android"
-			sheet = ExcelFile.sheet_by_name(os_name)
-			#print(os_name)
-			store_dic(os_name, sheet)
+                        if "iOS" == name_test or "ios" == name_test:
+                                os_name = "iOS"
+                        elif "Android" ==name_test or "android" == name_test:
+                                os_name = "Android"
+                        else:
+                                os_name = ""
+                        if os_name != "":
+                                sheet = ExcelFile.sheet_by_name(os_name)
+                                #print(os_name)
+                                store_dic(os_name, sheet)
+                        else:
+                                continue
 		if global_list.excel_dict['iOS'] != {} and global_list.excel_dict['Android'] != {}:
 			global_list.excel_value = 1
 		elif global_list.excel_dict['iOS'] != {}:
@@ -25,7 +29,8 @@ def do_excel(path):
 		elif global_list.excel_dict['Android'] != {}:
 			global_list.excel_value = 3
 		else:
-			return -1
+                        global_list.excel_value = -1
+                        return -1
 	else:
 		print("Excel no sheet")
 		global_list.excel_value = -1
