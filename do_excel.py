@@ -56,22 +56,31 @@ def do_excel(path):
 		#print ("Excel炸了")
 
 def store_dic(os_name, sheet):
-	name_rows = sheet.row_values(1)
-	if '友盟埋点' in name_rows:
-		key_index = name_rows.index("友盟埋点")
-	if '事件' in name_rows:
-		value_index = name_rows.index("事件")
-	if '主id' in name_rows:
-		id_fathere = name_rows.index("主id")
-	if '子id' in name_rows:
-		id_son = name_rows.index("子id")
-	if os_name == "iOS":
-		for i in range(2, int(sheet.nrows)):
-			global_list.excel_dict[os_name][sheet.cell_value(i, key_index)] = sheet.cell_value(i, value_index)
-	elif os_name == "Android":
-		for i in range(2, int(sheet.nrows)):
-			id_all = str(int(sheet.cell_value(i, id_fathere))) + ";" + str(int(sheet.cell_value(i, id_son)))
-			global_list.excel_dict[os_name][id_all] = sheet.cell_value(i, value_index)
+	for i in range(0, int(sheet.ncols)):
+		name_rows = sheet.row_values(i)
+		if '事件' in name_rows:
+			break
+		else:
+			continue
+	if i < int(sheet.ncols) - 1:
+		name_rows = sheet.row_values(i)
+		if '友盟埋点' in name_rows:
+			key_index = name_rows.index("友盟埋点")
+		if '事件' in name_rows:
+			value_index = name_rows.index("事件")
+		if '主id' in name_rows:
+			id_fathere = name_rows.index("主id")
+		if '子id' in name_rows:
+			id_son = name_rows.index("子id")
+		if os_name == "iOS":
+			for i in range(i+1, int(sheet.nrows)):
+				global_list.excel_dict[os_name][sheet.cell_value(i, key_index)] = sheet.cell_value(i, value_index)
+		elif os_name == "Android":
+			for i in range(i+1, int(sheet.nrows)):
+				id_all = str(int(sheet.cell_value(i, id_fathere))) + ";" + str(int(sheet.cell_value(i, id_son)))
+				global_list.excel_dict[os_name][id_all] = sheet.cell_value(i, value_index)
+	else:
+		global_list.excel_value = -2
 
 
 
