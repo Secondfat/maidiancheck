@@ -11,6 +11,8 @@ def do_excel(path):
 		return -1
 	try:
 		ExcelFile = xlrd.open_workbook(path)
+		global_list.excel_dict['iOS'] = {}
+		global_list.excel_dict['Android'] = {}
 	except:
 		global_list.excel_value = -2
 		return -1
@@ -23,7 +25,7 @@ def do_excel(path):
 			else:
 				os_name = ""
 			if os_name != "":
-				sheet = ExcelFile.sheet_by_name(os_name)
+				sheet = ExcelFile.sheet_by_name(name_test)
 				#print(os_name)
 				store_dic(os_name, sheet)
 			else:

@@ -76,7 +76,7 @@ class Example(QWidget):
         #self.change_value = []
 
         #定义控件
-        self.json_file_path = QLineEdit('D:/04 code/maidiancheck/App-搜索需求-V6.5埋点-V1.0.xlsx', self)
+        self.json_file_path = QLineEdit('', self)
         self.json_file_path.selectAll()
         self.json_file_path.setFocus()
         self.bt = QPushButton('选择文件')
