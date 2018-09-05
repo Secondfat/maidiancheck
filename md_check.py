@@ -235,7 +235,7 @@ class Example(QWidget):
     def pull_phone_info(self, os_name):
         # 添加下拉框的数据
         self.device_info.clear()
-        sql = "SELECT realphone, model FROM mobliephone WHERE osinfo='%s';" %os_name
+        sql = "SELECT realphone, model FROM mobliephone WHERE osinfo='%s' and realphone is not NULL and realphone <> ''" %os_name
         global_list.osname = os_name
         self.mobile_info = UpdateData.select_guo_db(UpdateData, sql)
         for mobile_temp in self.mobile_info:
