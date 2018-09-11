@@ -16,7 +16,7 @@ def do_excel(path):
 	except:
 		global_list.excel_value = -2
 		return -1
-	if len(ExcelFile.sheet_names()) > 1:
+	if len(ExcelFile.sheet_names()) >= 1:
 		for name_test in ExcelFile.sheet_names():
 			if "iOS" == name_test or "ios" == name_test:
 				os_name = "iOS"

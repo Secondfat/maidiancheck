@@ -182,7 +182,7 @@ class Example(QWidget):
     @pyqtSlot()
     def show_excel_message(self):#弹窗槽函数
         print("!!")
-        value_result = {'1':'iOS和Android埋点解析完毕', '2':'iOS和Android埋点解析完毕', '3':'iOS和Android埋点解析完毕', \
+        value_result = {'1':'iOS和Android埋点解析完毕', '2':'iOS埋点解析完毕', '3':'Android埋点解析完毕', \
                         '-1':'无对应埋点需求，请检查上传的文档', '-2':'请检查文档是否正确', '-3':'请填写APP版本号', '-4':'请选择系统'}
         if int(global_list.excel_value) < 10:
             QMessageBox.information(self, "提示", value_result[str(global_list.excel_value)],
